@@ -5,44 +5,126 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>m4rt2004</title>
   <style>
+    /* Variáveis para o Tema (Dark de padrão) */
+    :root {
+      --bg-color: #0d0d0f;
+      --text-color: #e4e4e7;
+      --hover-color: #fff;
+    }
+
+    /* Tema Claro (Light mode) */
+    body.light-mode {
+      --bg-color: #f4f4f5;
+      --text-color: #3f3f46;
+      --hover-color: #000;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       height: 100vh;
-      background: #0d0d0f;
+      background: var(--bg-color);
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: background-color 0.4s ease;
+      font-family: sans-serif;
+      overflow: hidden;
     }
 
+    /* Interface: Botões Flutuantes (Absolutos) */
+    .btn-absolute {
+      position: absolute;
+      background: transparent;
+      border: none;
+      color: var(--text-color);
+      cursor: pointer;
+      padding: 10px;
+      opacity: 0.3; /* Estado natural mais transparente */
+      transition: color 0.3s ease, transform 0.2s ease, opacity 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    /* Foco nos botões absolutos */
+    .btn-absolute:hover {
+      color: var(--hover-color);
+      transform: scale(1.1);
+      opacity: 1; /* Opacidade total no hover */
+    }
+
+    .btn-lang {
+      top: 24px;
+      right: 24px;
+    }
+
+    .btn-theme {
+      bottom: 24px;
+      left: 24px;
+    }
+
+    .btn-theme svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    /* Container e Redes Sociais */
     .social-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 28px;
+      gap: 20px;
       padding: 24px;
+    }
+
+    /* NOVO COMPORTAMENTO DO HOVER: Usando :has()
+       O efeito só ocorre quando um link (<a>) DENTRO do container estiver em hover.
+       Isso remove a "área de influência falsa" dos espaços vazios. */
+    .social-row:has(a:hover) a:not(:hover) {
+      opacity: 0.3;
     }
 
     .social-row a {
       display: flex;
-      color: #e4e4e7;
-      transition: color 0.2s, transform 0.2s;
+      color: var(--text-color);
+      padding: 12px;
+      border-radius: 50%;
+      opacity: 1;
+      transition: color 0.3s ease, opacity 0.3s ease, transform 0.1s ease-out; 
     }
 
+    /* O elemento que de fato está com o mouse em cima recupera o foco total */
     .social-row a:hover {
-      color: #fff;
-      transform: translateY(-2px);
+      opacity: 1;
+      color: var(--hover-color);
     }
 
     .social-row svg {
       width: 28px;
       height: 28px;
       fill: currentColor;
+      pointer-events: none; /* Deixa o evento de mouse focado apenas na tag A */
     }
   </style>
 </head>
 <body>
+
+  <!-- Botões Absolutos -->
+  <button class="btn-absolute btn-lang" aria-label="Mudar Idioma">pt</button>
+  
+  <button class="btn-absolute btn-theme" id="theme-toggle" aria-label="Mudar Tema">
+    <!-- Ícone de Lua (Dark Mode) -->
+    <svg id="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+    <!-- Ícone de Sol (Light Mode) -->
+    <svg id="sun-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+  </button>
+
+  <!-- Redes Sociais -->
   <div class="social-row">
 
     <a href="https://discord.com/invite/JnsBAh6efh" target="_blank" rel="noopener noreferrer" aria-label="Discord">
@@ -78,5 +160,83 @@
     </a>
 
   </div>
+
+  <script>
+    const originalTitle = "m4rt2004";
+    
+    // -----------------------------------------------------
+    // 1. ALTERNAR TEMA (Dark / Light Mode)
+    // -----------------------------------------------------
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const moonIcon = document.getElementById('moon-icon');
+    const sunIcon = document.getElementById('sun-icon');
+
+    themeToggleBtn.addEventListener('click', () => {
+      document.body.classList.toggle('light-mode');
+      
+      if (document.body.classList.contains('light-mode')) {
+        moonIcon.style.display = 'none';
+        sunIcon.style.display = 'block';
+      } else {
+        moonIcon.style.display = 'block';
+        sunIcon.style.display = 'none';
+      }
+    });
+
+    // -----------------------------------------------------
+    // 2. DETECTAR ABA EM SEGUNDO PLANO (Blur / Visibility)
+    // -----------------------------------------------------
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        document.title = "me esqueceu aberta 😢";
+      } else {
+        document.title = originalTitle;
+      }
+    });
+
+    // -----------------------------------------------------
+    // 3. EASTER EGGS NO TAB NAME E EFEITO MAGNÉTICO
+    // -----------------------------------------------------
+    const socialLinks = document.querySelectorAll('.social-row a');
+
+    const jokes = {
+      "Discord": "Alerta de Ping!",
+      "X": "Elon Musk.",
+      "YouTube": "Anúncio 1 de 2...",
+      "Instagram": "Mais um story de café.",
+      "Twitch": "F no chat.",
+      "TikTok": "Só mais um vídeo, prometo.",
+      "Steam": "Jogos na biblioteca que nunca abri.",
+      "Roblox": "OOF!"
+    };
+
+    socialLinks.forEach(link => {
+      const network = link.getAttribute('aria-label');
+
+      link.addEventListener('mouseenter', () => {
+        // Garante que só mostre a piada se a aba estiver visível
+        if (jokes[network] && !document.hidden) {
+          document.title = jokes[network];
+        }
+      });
+
+      link.addEventListener('mouseleave', () => {
+        if (!document.hidden) {
+          document.title = originalTitle;
+        }
+        link.style.transform = `translate(0px, 0px)`;
+      });
+
+      link.addEventListener('mousemove', (e) => {
+        const rect = link.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const moveX = e.clientX - centerX;
+        const moveY = e.clientY - centerY;
+        
+        link.style.transform = `translate(${moveX * 0.3}px, ${moveY * 0.3}px)`;
+      });
+    });
+  </script>
 </body>
 </html>
