@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rádio m4rt2004</title>
+    <meta name="description" content="Hub da m4rt2004: música, ambientes e bate-papo ao vivo.">
+    <meta name="theme-color" content="#000000">
+    <meta property="og:title" content="VTuber Hub - m4rt2004">
+    <meta property="og:description" content="Música, ambientes e bate-papo ao vivo.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎧</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
+        body { font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; background-color: #000; }
+
+        .bg-video {
+            position: fixed; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover; z-index: 1;
+        }
+
+        .ui-layer {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; flex-direction: column; justify-content: space-between;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 15%, transparent 75%, rgba(0,0,0,0.8) 100%);
+        }
+        header, footer { pointer-events: auto; }
+
+        header { display: flex; justify-content: space-between; align-items: flex-start; padding: 40px 50px; }
+        .logo { font-weight: 700; font-size: 26px; letter-spacing: -1px; opacity: 0.3; transition: opacity 0.3s ease; cursor: pointer; }
+        .logo:hover { opacity: 1; }
+        .login-btn { color: #fff; text-decoration: none; font-size: 13px; opacity: 0.8; transition: 0.2s; }
+        .login-btn:hover { opacity: 1; }
+
+        footer { display: flex; justify-content: space-between; align-items: flex-end; padding: 30px 50px; gap: 24px; }
+        .left-controls { display: flex; align-items: center; gap: 40px; }
+
+        .track-info { display: flex; align-items: center; gap: 15px; cursor: pointer; }
+        .track-info img { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .track-texts { display: flex; flex-direction: column; gap: 3px; }
+        .track-title { font-weight: 600; font-size: 15px; }
+        .track-artist { font-weight: 300; font-size: 14px; opacity: 0.8; }
+
+        .player-controls { display: flex; align-items: center; gap: 18px; }
+        .player-controls i { font-size: 20px; cursor: pointer; opacity: 0.7; transition: 0.2s; }
+        .player-controls i:hover, .player-controls i.open { opacity: 1; transform: scale(1.1); }
+        .divider { width: 1px; height: 16px; background: rgba(255,255,255,0.3); margin: 0 5px; }
+
+        .right-menu { display: flex; gap: 35px; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .menu-item:hover, .menu-item.open { opacity: 1; transform: translateY(-2px); }
+        .menu-item i { font-size: 26px; }
+        .menu-item span { font-size: 11px; letter-spacing: 0.3px; }
+
+        :focus-visible { outline: 2px solid #fff; outline-offset: 4px; border-radius: 4px; }
+
+        /* --- PAINÉIS ANCORADOS NO ÍCONE --- */
+        .panel {
+            position: fixed; z-index: 30;
+            width: 320px; max-width: calc(100vw - 32px);
+            background: rgba(15,15,15,0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transform: translateY(10px) scale(0.92);
+            transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2), visibility 0s linear 0.25s;
+        }
+        .panel.active {
+            opacity: 1; visibility: visible; pointer-events: auto;
+            transform: none;
+            transition-delay: 0s;
+        }
+        .panel.wide { width: 380px; }
+        .panel::after { /* seta apontando para o ícone */
+            content: ''; position: absolute; bottom: -6px;
+            left: var(--arrow-x, 50%);
+            width: 12px; height: 12px; margin-left: -6px;
+            background: rgba(15,15,15,0.95);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+        }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .panel-header h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .close-btn { background: none; border: none; color: #fff; cursor: pointer; font-size: 20px; opacity: 0.6; }
+        .close-btn:hover { opacity: 1; }
+        .panel-content { font-size: 13px; color: #ccc; line-height: 1.5; }
+        .panel iframe { display: block; width: 100%; border: 0; border-radius: 12px; }
+        .panel a { color: #fff; }
+
+        @media (max-width: 900px) {
+            header { padding: 24px; }
+            footer { flex-direction: column; align-items: stretch; padding: 20px 24px; gap: 18px; }
+            .left-controls { gap: 20px; justify-content: space-between; }
+            .right-menu { gap: 0; justify-content: space-between; }
+            .menu-item span { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .panel, .ui-layer, .menu-item, .player-controls i { transition: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Dica de produção: hospede seu próprio vídeo (ex.: /bg.mp4). Links de CDNs de terceiros podem bloquear hotlink. -->
+    <video class="bg-video" autoplay loop muted playsinline>
+        <source src="https://cdn.pixabay.com/video/2020/05/24/40090-424722513_large.mp4" type="video/mp4">
+    </video>
+
+    <div class="ui-layer" id="uiLayer">
+
+        <header>
+            <a class="logo" href="index.html" style="color:inherit;text-decoration:none;">m4rt2004</a>
+            <a href="#" class="login-btn" data-menu="login">Conecte-se</a>
+        </header>
+
+        <footer>
+            <div class="left-controls">
+                <div class="track-info" data-menu="spotify" tabindex="0" role="button" aria-label="Abrir playlist">
+                    <img id="cover" src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=150&auto=format&fit=crop" alt="Capa da playlist">
+                    <div class="track-texts">
+                        <span class="track-title" id="plTitle">Playlist</span>
+                        <span class="track-artist" id="plSub">m4rt2004</span>
+                    </div>
+                </div>
+
+                <div class="player-controls">
+                    <i class="ph ph-play-circle" id="playBtn" tabindex="0" role="button" aria-label="Tocar ou pausar"></i>
+                    <i class="ph ph-speaker-high" data-menu="volume" tabindex="0" role="button" aria-label="Volume"></i>
+                    <div class="divider"></div>
+                    <i class="ph ph-plus-circle" data-menu="add" tabindex="0" role="button" aria-label="Adicionar"></i>
+                    <i class="ph ph-spotify-logo" data-menu="spotify" tabindex="0" role="button" aria-label="Spotify"></i>
+                    <i class="ph ph-tote" data-menu="loja" tabindex="0" role="button" aria-label="Loja"></i>
+                    <i class="ph ph-corners-out" id="fsBtn" tabindex="0" role="button" aria-label="Tela cheia"></i>
+                </div>
+            </div>
+
+            <div class="right-menu">
+                <div class="menu-item" data-menu="presets" tabindex="0" role="button"><i class="ph ph-faders"></i><span>Predefinições</span></div>
+                <div class="menu-item" data-menu="musica" tabindex="0" role="button"><i class="ph ph-radio"></i><span>Música</span></div>
+                <div class="menu-item" data-menu="visuais" tabindex="0" role="button"><i class="ph ph-image"></i><span>Visuais</span></div>
+                <div class="menu-item" data-menu="sons" tabindex="0" role="button"><i class="ph ph-waveform"></i><span>Sons</span></div>
+                <div class="menu-item" data-menu="historia" tabindex="0" role="button"><i class="ph ph-text-align-left"></i><span>História</span></div>
+                <div class="menu-item" data-menu="chat" tabindex="0" role="button"><i class="ph ph-chat-circle"></i><span>Bater papo</span></div>
+            </div>
+        </footer>
+
+        <!-- Painel do Spotify: fica sempre no DOM para a música não parar ao fechar -->
+        <div class="panel wide" id="panel-spotify" data-panel="spotify">
+            <div class="panel-header">
+                <h2><i class="ph ph-spotify-logo"></i> Spotify</h2>
+                <button class="close-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="panel-content"><div id="spotifyEmbed"></div></div>
+        </div>
+    </div>
+
+    <script>
+        /* ================== CONFIGURAÇÃO ==================
+           Playlist Spotify da rádio m4rt2004.
+           https://open.spotify.com/playlist/XXXXXXXX?si=...  ->  o ID é o XXXXXXXX */
+        const PLAYLIST = {
+            id: '2673ZIfzOsSNLmeX9Cjmvt',
+            title: 'Rádio m4rt2004',
+            subtitle: 'm4rt2004',
+            cover: ''   // opcional: URL de uma imagem de capa
+        };
+        const CHAT_EMBED_URL = 'https://www.twitch.tv/embed/m4rt2004/chat?parent=m4rt2004.github.io';
+
+        const MENUS = {
+            login:    { title: 'Login',        icon: 'ph-user',           text: 'Área de login para membros.' },
+            volume:   { title: 'Volume',       icon: 'ph-speaker-high',   text: 'O volume da música é ajustado no player do Spotify (ícone ao lado).' },
+            add:      { title: 'Adicionar',    icon: 'ph-plus-circle',    text: 'Adicione músicas à sua playlist.' },
+            loja:     { title: 'Loja',         icon: 'ph-tote',           text: 'Loja de pontos e resgate de recompensas.' },
+            presets:  { title: 'Predefinições',icon: 'ph-faders',         text: 'Ajuste a qualidade de vídeo e a latência do chat.' },
+            musica:   { title: 'Música',       icon: 'ph-radio',          text: 'Troque a estação da rádio ou a playlist atual.' },
+            visuais:  { title: 'Visuais',      icon: 'ph-image',          text: 'Mude o cenário de fundo (Quarto, Cidade, Natureza).' },
+            sons:     { title: 'Sons',         icon: 'ph-waveform',       text: 'Ative sons ambientes como chuva, lareira ou multidão.' },
+            historia: { title: 'História',     icon: 'ph-text-align-left',text: 'Conheça a lore da m4rt2004 e as regras do chat.' },
+            chat:     { title: 'Bater papo',   icon: 'ph-chat-circle',    text: CHAT_EMBED_URL ? '' : 'Configure CHAT_EMBED_URL para carregar o chat da Twitch aqui.', wide: true }
+        };
+
+        const $ = (s, r = document) => r.querySelector(s);
+        const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+        const uiLayer = $('#uiLayer');
+
+        // Cabeçalho da playlist
+        $('#plTitle').textContent = PLAYLIST.title;
+        $('#plSub').textContent = PLAYLIST.subtitle;
+        if (PLAYLIST.cover) $('#cover').src = PLAYLIST.cover;
+
+        // Cria os painéis (um por menu) a partir do objeto MENUS
+        Object.entries(MENUS).forEach(([key, m]) => {
+            const p = document.createElement('div');
+            p.className = 'panel' + (m.wide ? ' wide' : '');
+            p.dataset.panel = key;
+            p.innerHTML = `
+                <div class="panel-header">
+                    <h2><i class="ph ${m.icon}"></i> ${m.title}</h2>
+                    <button class="close-btn" aria-label="Fechar"><i class="ph ph-x"></i></button>
+                </div>
+                <div class="panel-content">${m.text ? `<p>${m.text}</p>` : ''}</div>`;
+            if (key === 'chat' && CHAT_EMBED_URL) {
+                const f = document.createElement('iframe');
+                f.src = CHAT_EMBED_URL; f.height = 420; f.title = 'Chat';
+                $('.panel-content', p).appendChild(f);
+            }
+            uiLayer.appendChild(p);
+        });
+
+        // --- Abrir/fechar painel ancorado no ícone ---
+        let current = null; // {key, trigger}
+
+        function position(panel, trigger) {
+            const r = trigger.getBoundingClientRect();
+            const w = panel.offsetWidth;
+            const cx = r.left + r.width / 2;
+            const left = Math.max(16, Math.min(cx - w / 2, innerWidth - w - 16));
+            panel.style.left = left + 'px';
+            panel.style.bottom = (innerHeight - r.top + 14) + 'px';
+            panel.style.setProperty('--arrow-x', (cx - left) + 'px');
+            panel.style.transformOrigin = (cx - left) + 'px 100%';
+        }
+
+        function closeMenu() {
+            $$('.panel.active').forEach(p => p.classList.remove('active'));
+            $$('.open').forEach(t => t.classList.remove('open'));
+            current = null;
+            resetInactivity();
+        }
+
+        function openMenu(key, trigger) {
+            if (current && current.key === key && current.trigger === trigger) return closeMenu();
+            closeMenu();
+            const panel = $(`.panel[data-panel="${key}"]`);
+            if (!panel) return;
+            position(panel, trigger);
+            panel.classList.add('active');
+            trigger.classList.add('open');
+            current = { key, trigger };
+            resetInactivity();
+        }
+
+        $$('[data-menu]').forEach(el => {
+            const go = e => { e.preventDefault(); e.stopPropagation(); openMenu(el.dataset.menu, el); };
+            el.addEventListener('click', go);
+            el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') go(e); });
+        });
+        ['#playBtn', '#fsBtn'].forEach(s => $(s).addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } }));
+        $$('.close-btn').forEach(b => b.addEventListener('click', closeMenu));
+        document.addEventListener('click', e => { if (current && !e.target.closest('.panel')) closeMenu(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+        addEventListener('resize', () => { if (current) position($(`.panel[data-panel="${current.key}"]`), current.trigger); });
+
+        // --- Tela cheia ---
+        $('#fsBtn').addEventListener('click', () => {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.documentElement.requestFullscreen?.();
+        });
+
+        // --- Spotify (iFrame API): play/pause externo sincronizado ---
+        let spotify = null;
+        const playBtn = $('#playBtn');
+        const setPlaying = on => { playBtn.className = 'ph ' + (on ? 'ph-pause-circle' : 'ph-play-circle'); };
+
+        window.onSpotifyIframeApiReady = api => {
+            api.createController($('#spotifyEmbed'),
+                { uri: 'spotify:playlist:' + PLAYLIST.id, width: '100%', height: 352 },
+                ctrl => {
+                    spotify = ctrl;
+                    ctrl.addListener('playback_update', e => setPlaying(!e.data.isPaused));
+                });
+        };
+        playBtn.addEventListener('click', () => {
+            if (spotify) spotify.togglePlay();
+            else openMenu('spotify', playBtn);
+        });
+        const sp = document.createElement('script');
+        sp.src = 'https://open.spotify.com/embed/iframe-api/v1';
+        sp.async = true;
+        document.body.appendChild(sp);
+
+        // --- Interface some após inatividade (nunca com painel aberto) ---
+        let timer;
+        function resetInactivity() {
+            uiLayer.style.opacity = '1';
+            clearTimeout(timer);
+            timer = setTimeout(() => { if (!current) uiLayer.style.opacity = '0'; }, 3500);
+        }
+        ['mousemove', 'mousedown', 'keydown', 'touchstart'].forEach(ev => addEventListener(ev, resetInactivity, { passive: true }));
+        resetInactivity();
+    </script>
+</body>
+</html>
