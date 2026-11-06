@@ -6,15 +6,15 @@
   <title>m4rt2004</title>
   <style>
     :root {
-      --bg-color: #0b0d0b;
-      --text-color: #e7ebe7;
-      --hover-color: #00c83b;
+      --bg-color: #0d0d0f;
+      --text-color: #e4e4e7;
+      --hover-color: #fff;
     }
 
     body.light-mode {
       --bg-color: #f4f4f5;
-      --text-color: #252925;
-      --hover-color: #087b2b;
+      --text-color: #3f3f46;
+      --hover-color: #000;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -68,33 +68,20 @@
       fill: currentColor;
     }
 
-
-    .quick-nav { position: fixed; top: 50%; right: 24px; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 5; }
-    .quick-nav a { width: 48px; height: 48px; display:flex; align-items:center; justify-content:center; color:var(--text-color); opacity:0; border:1px solid currentColor; border-radius:50%; transform:scale(.88); transition:opacity .22s ease, transform .22s ease, color .2s, background .2s; background:color-mix(in srgb,var(--bg-color) 78%,transparent); }
-    /* Easter eggs: os atalhos ficam invisíveis até o cursor chegar ao botão. */
-    .quick-nav a:hover, .quick-nav a:focus-visible { opacity:1; transform:scale(1.08); }
-    .quick-nav a:active { transform:scale(.98); }
-    .quick-nav a::after { content:attr(title); position:absolute; right:58px; white-space:nowrap; font-size:.75rem; font-weight:600; letter-spacing:.02em; color:var(--text-color); background:var(--bg-color); border:1px solid color-mix(in srgb,var(--hover-color) 35%,transparent); border-radius:7px; padding:5px 8px; opacity:0; pointer-events:none; transform:translateX(4px); transition:opacity .18s,transform .18s; }
-    .quick-nav a:hover::after, .quick-nav a:focus-visible::after { opacity:1; transform:translateX(0); }
-    .quick-nav a:hover { opacity:1; color:var(--hover-color); transform:scale(1.08); background:color-mix(in srgb,var(--hover-color) 9%,var(--bg-color)); }
-    .quick-nav svg { width:22px; height:22px; fill:currentColor; }
-    .quick-nav a:focus-visible { outline:2px solid var(--hover-color); outline-offset:4px; }
-    @media(max-width:600px) { .quick-nav { right:10px; gap:8px; } .quick-nav a { width:42px;height:42px;background:color-mix(in srgb,var(--bg-color) 70%,transparent); } .social-row { padding-right:62px; } }
-
     .social-row {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      padding: 20px;
+      gap: 20px;
+      padding: 24px;
     }
 
     .social-row:has(a:hover) a:not(:hover) {
       opacity: 0.3;
     }
 
-    .social-row a {\n      border: 1px solid transparent;
+    .social-row a {
       display: flex;
       color: var(--text-color);
       padding: 12px;
@@ -103,7 +90,7 @@
       transition: color 0.3s ease, opacity 0.3s ease, transform 0.1s ease-out; 
     }
 
-    .social-row a:hover {\n      border-color: color-mix(in srgb, var(--hover-color) 45%, transparent);\n      background: color-mix(in srgb, var(--hover-color) 8%, transparent);
+    .social-row a:hover {
       opacity: 1;
       color: var(--hover-color);
     }
@@ -124,22 +111,6 @@
     <svg id="moon-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
     <svg id="sun-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
   </button>
-
-
-  <nav class="quick-nav" aria-label="Atalhos secretos: mova o cursor sobre os ícones para revelá-los">
-    <a href="radio.html" aria-label="Rádio" title="Rádio">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 5H9.2l8.1-2.7-.6-1.8L4.5 5H4a3 3 0 0 0-3 3v11a3 3 0 0 0 3 3h16a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3ZM4 7h16a1 1 0 0 1 1 1v2H3V8a1 1 0 0 1 1-1Zm16 13H4a1 1 0 0 1-1-1v-7h18v7a1 1 0 0 1-1 1ZM6 14h5v4H6z"/></svg>
-    </a>
-    <a href="loja.html" aria-label="Loja" title="Loja">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16l2 5a3 3 0 0 1-2 3v8H4v-8a3 3 0 0 1-2-3l2-5Zm1.4 2-1.2 3a1 1 0 0 0 1.9.7L7 7h2l.3 2.7a1 1 0 0 0 2-.1L11.2 7h1.6l-.1 2.6a1 1 0 0 0 2 .1L15 7h2l.9 2.7a1 1 0 0 0 1.9-.7l-1.2-3H5.4ZM6 13v5h12v-5a4 4 0 0 1-3-1.4 4 4 0 0 1-3 1.4 4 4 0 0 1-3-1.4A4 4 0 0 1 6 13Z"/></svg>
-    </a>
-    <a href="media-kit.html" aria-label="Media kit" title="Media kit">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2ZM4 6h16v12H4V6Zm2 10 3.2-4 2.4 2.8 2.1-2.3L18 16H6Zm2-6a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"/></svg>
-    </a>
-    <a href="perfil.html" aria-label="Perfil" title="Perfil">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0 2c-4.4 0-8 2.2-8 5v3h16v-3c0-2.8-3.6-5-8-5Z"/></svg>
-    </a>
-  </nav>
 
   <div class="social-row">
 
